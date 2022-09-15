@@ -9,12 +9,42 @@ class Graph:
     edges = []
     flag = 0
     prev = -1
-    
+    nd=[]
+    s=1
+    n=1
     INF = 10**9
     
     def __Root_Window(self):
         self.root = tk.Tk() #first line
         self.root.title("Graph ADT")
+        
+        self.leftframe = LabelFrame(self.root, padx=50, pady=500, height=500)
+        self.leftframe.pack(padx=10, pady=10,side=LEFT)
+        
+        def set_start():
+            self.s=self.menu.get()  
+        
+        def set_goal():
+            self.n=self.menu1.get()   
+
+            
+        self.menu=StringVar()
+        self.menu1=StringVar()
+        
+        
+   
+        self.b1 = Button(self.leftframe, text="Set Start",width=10,command=set_start)
+        self.b1.grid(row=0, column=0)
+        
+        self.b2 = Button(self.leftframe, text="Set Goal",width=10, command=set_goal)
+        self.b2.grid(row=1, column=0)
+        
+        self.e=OptionMenu(self.leftframe, self.menu,-1)
+        self.e.grid(row=0, column=1)
+        
+        self.e1=OptionMenu(self.leftframe, self.menu1,-1)
+        self.e1.grid(row=1, column=1)
+
         
         #Code to align Window in the middle of the screen irrespective of the screen dimention 
         self.window_width = 1000
@@ -48,10 +78,16 @@ class Graph:
             y = event.y
             r = 30
             self.node.append([node_id,x,y])
-            
+            self.nd.append(node_id)
             self.canva.create_oval(x-r,y-r,x+r,y+r,tags = 'del',width = 3)
             self.canva.create_text(x,y,text = "{0}".format(node_id),fill = "black",tags = "del",font=('Helvetica 25 bold'))
-        
+
+            self.e=OptionMenu(self.leftframe, self.menu,*self.nd)
+            self.e.grid(row=0, column=1)
+            
+            self.e1=OptionMenu(self.leftframe, self.menu1,*self.nd)
+            self.e1.grid(row=1, column=1)
+            
         def add_edge(event):
             if(len(self.node) == 0):
                 return
@@ -112,7 +148,57 @@ class Graph:
         self.canva.update()
     
     def __algo(self):
-        def DFS(event):
+
+        def dist(k,n):
+            x=self.node[int(n)-1][1]
+            y=self.node[int(n)-1][2]
+            x1=self.node[int(k)-1][1]
+            y1=self.node[int(k)-1][2]
+            return math.sqrt((x-x1)**2 + (y-y1)**2)//10
+
+
+        def BS(event):
+            
+            adj_list = {}
+            for i in self.node:
+                adj_list[str(i[0])] = []
+            
+            for i in self.edges:
+                if(str(i[0]) not in adj_list[str(i[1])]):
+                    adj_list[str(i[0])] += [str(i[1])]
+                    adj_list[str(i[1])] += [str(i[0])]
+            
+        
+            #start = 0, source = n
+            n=str(self.n)
+            s=str(self.s)
+            flag=[]
+            b_width=2
+            def bs(s,n):
+                vis = []
+                que = []
+                vis.append(s)
+                que.append(s)
+
+                while (que):
+                    m = que.pop(0)
+                    adj_list[m].sort(key=lambda x: dist(x,n))
+                    for i in adj_list[m]:
+                        if i not in vis :
+                            if n in vis:
+                                time.sleep(5)
+                                break
+                            self.path(int(m),int(i),"red","algo")
+                            time.sleep(0.5)
+                            vis.append(i)
+                            que.append(i)
+            bs(s,n)
+
+            self.canva.delete("algo")
+        self.root.bind("4",BS)
+                
+
+        def HC(event):
             
             adj_list = {}
             for i in self.node:
@@ -125,19 +211,62 @@ class Graph:
             
             
             #start = 0, source = n
-            n = str(len(self.node))
-            s = '1'
+            n=str(self.n)
+            s=str(self.s)
             vis = []
+            flag = []
+            def hc(s,n):
+                
+                if(s == n):
+                    time.sleep(5)
+                    flag.append(1)
+                    return 
+                
+                vis.append(s)
+                
+                adj_list[s].sort(key=lambda x: dist(x,n))
+                
+                for i in adj_list[s]:
+                    if(i not in vis and not flag):
+                        self.path(int(s),int(i),"red","algo")
+                        time.sleep(0.5)
+                        hc(i,n)
+                        self.path(int(s),int(i),"#999999","algo")
+                        time.sleep(0.2)
+              
+            hc(s,n)            
             
+            self.canva.delete("algo")
+        self.root.bind("3",HC)
+        
+        def DFS(event):
+        
+            adj_list = {}
+            for i in self.node:
+                adj_list[str(i[0])] = []
+            
+            for i in self.edges:
+                if(str(i[0]) not in adj_list[str(i[1])]):
+                    adj_list[str(i[0])] += [str(i[1])]
+                    adj_list[str(i[1])] += [str(i[0])]
+            
+            
+            #start = 0, source = n
+            n=str(self.n)
+            s=str(self.s)
+            vis = []
+            flag=[]
             def dfs(s,n):
                 
                 if(s == n):
                     time.sleep(5)
-                    return
+                    flag.append(1)
+                    return 
                 
                 vis.append(s)
+                adj_list[s].sort()
                 for i in adj_list[s]:
-                    if(i not in vis):
+                    if(i not in vis and not flag):
                         self.path(int(s),int(i),"red","algo")
                         time.sleep(0.5)
                         dfs(i,n)
@@ -154,16 +283,16 @@ class Graph:
             adj_list = {}
             for i in self.node:
                 adj_list[str(i[0])] = []
-            print(adj_list)
+            
             for i in self.edges:
                 if(str(i[0]) not in adj_list[str(i[1])]):
                     adj_list[str(i[0])] += [str(i[1])]
                     adj_list[str(i[1])] += [str(i[0])]
             
-            print(adj_list)
+        
             #start = 0, source = n
-            n = str(len(self.node))
-            s = '1'
+            n=str(self.n)
+            s=str(self.s)
             vis = []
             que = []
             def bfs(s,n):
@@ -173,6 +302,7 @@ class Graph:
 
                 while (que):
                     m = que.pop(0)
+                    adj_list[m].sort()
                     for i in adj_list[m]:
                         if i not in vis :
                             if n in vis:
@@ -196,4 +326,3 @@ class Graph:
         self.root.mainloop() #Last line
         
 g = Graph()
-
