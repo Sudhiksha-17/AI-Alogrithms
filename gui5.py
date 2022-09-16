@@ -131,9 +131,9 @@ class Graph:
                 #self.d.append(d0)
                 if(self.prev != closest_node):
                     self.edges.append([self.prev,closest_node,dist//10])
-                    print(self.edges)
+                    #print(self.edges)
                     self.edges.append([closest_node,self.prev,dist//10])
-                    print(self.edges)
+                    #print(self.edges)
                     self.canva.create_line(x1,y1,x2,y2,width = 5,tags = "del",fill='#999999')
                     
                     self.canva.create_text(x1,y1,text = "{0}".format(self.prev),fill = "black",tags = "del",font=('Helvetica 25 bold'))
@@ -183,11 +183,11 @@ class Graph:
                 if(s == n):
                     time.sleep(5)
                     return
-                i=0
+                
                 vis.append(s)
                 visited_label =Label(self.leftframe, text = 'Visited: '+str(vis[(len(vis)-1)]), font=('calibre',10, 'bold'))
                 visited_label.grid(row=2, column=0)
-                print(vis)
+                #print(vis)
                 #print(self.d)
                 for i in range(len(self.edges)):
                     if len(vis)!=1:
