@@ -156,7 +156,91 @@ class Graph:
             y1=self.node[int(k)-1][2]
             return math.sqrt((x-x1)**2 + (y-y1)**2)//10
 
+        def BMS(event):
+            adj_list = {}
+            for i in self.node:
+                adj_list[str(i[0])] = []
+            
+            for i in self.edges:
+                if(str(i[0]) not in adj_list[str(i[1])]):
+                    adj_list[str(i[0])] += [str(i[1])]
+                    adj_list[str(i[1])] += [str(i[0])]
+            
+        
+            #start = 0
 
+            s=str(self.s)
+            vis=[]
+            def bms(s):
+                vis.append(s)
+                for i in adj_list[s]:
+                    if i not in vis:
+                        self.path(int(s),int(i),"red","algo")
+                        time.sleep(0.5)
+                        bms(i)
+                        self.path(int(s),int(i),"#999999","algo")
+                        time.sleep(0.2)
+                        vis.pop()
+                return
+                    
+            bms(s)
+
+            self.canva.delete("algo")
+        self.root.bind("5",BMS) 
+
+        def ORACLE(event):
+            adj_list = {}
+            for i in self.node:
+                adj_list[str(i[0])] = []
+            
+            for i in self.edges:
+                if(str(i[0]) not in adj_list[str(i[1])]):
+                    adj_list[str(i[0])] += [str(i[1])]
+                    adj_list[str(i[1])] += [str(i[0])]
+            
+        
+            #start = 0, source = n
+
+            s=str(self.s)
+            n=str(self.n)
+            self.orac=2
+            vis=[]
+            def oracle(s,n):
+                self.cost=0
+                vis.append(s)
+                print(vis)
+                for i in self.edges:
+                    if len(vis)!=1:
+                        for j in range(len(vis)-1):
+                            if int(vis[j])==i[0] and int(vis[j+1])==i[1]:
+                                self.cost=self.cost+int(i[2])
+                                break
+                print("cost : ",self.cost)
+                if(s == n):
+                    print("Goal")
+                    if self.orac==2:
+                        self.orac=self.cost
+                    elif self.cost<self.orac:
+                        self.orac=self.cost
+                        print(self.orac,"Found")
+                    
+                for i in adj_list[s]:
+                    if i not in vis:
+                        self.path(int(s),int(i),"red","algo")
+                        time.sleep(0.5)
+                        oracle(i,n)
+                        self.path(int(s),int(i),"#999999","algo")
+                        time.sleep(0.2)
+                        vis.pop()
+                return
+                    
+            oracle(s,n)
+
+            self.canva.delete("algo")
+        self.root.bind("6",ORACLE) 
+        
+        
+    
         def BS(event):
             
             adj_list = {}
@@ -318,11 +402,11 @@ class Graph:
             self.canva.delete("algo")
         self.root.bind("2",BFS) 
     
-    def __init__(self):
+    def _init_(self):
         self.__Root_Window()
         self.__canva()
         self.__draw()        
         self.__algo()
         self.root.mainloop() #Last line
-        
-g = Graph()
+        
+g = Graph()
